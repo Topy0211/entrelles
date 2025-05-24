@@ -1,7 +1,6 @@
 
 'use client'; // Make this a Client Component
 
-import type { Metadata } from 'next';
 import React, { useState } from 'react'; // Import React and useState
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -15,13 +14,7 @@ import { CalendarIcon, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-// Metadata can be exported from a Client Component, but it's often better in a layout or parent Server Component.
-// For simplicity here, we'll keep it, but Next.js might handle it differently for Client Components.
-// Consider moving to a layout.tsx if issues arise or for best practice.
-export const metadata: Metadata = {
-  title: 'Chercher un trajet - Entrelles',
-  description: 'Trouvez un covoiturage adapté à vos besoins sur Entrelles.',
-};
+// Metadata has been moved to layout.tsx
 
 export default function ChercherTrajetPage() {
   const [date, setDate] = useState<Date | undefined>(undefined); // Manage date state

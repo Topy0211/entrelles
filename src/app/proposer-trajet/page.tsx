@@ -1,4 +1,8 @@
-import { Metadata } from 'next';
+
+'use client'; // Make this a Client Component
+
+import React, { useState } from 'react'; // Import React and useState
+// Removed: import type { Metadata } from 'next';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,13 +16,14 @@ import { CalendarIcon, PlusCircle, Car } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-export const metadata: Metadata = {
-  title: 'Proposer un trajet - Entrelles',
-  description: 'Partagez votre trajet et vos frais sur Entrelles.',
-};
+// Removed metadata export:
+// export const metadata: Metadata = {
+//   title: 'Proposer un trajet - Entrelles',
+//   description: 'Partagez votre trajet et vos frais sur Entrelles.',
+// };
 
 export default function ProposerTrajetPage() {
-  // const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(new Date()); // Manage date state
 
   return (
     <>
@@ -52,13 +57,17 @@ export default function ProposerTrajetPage() {
                           className="w-full justify-start text-left font-normal h-12 text-base"
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {/* {date ? format(date, "PPP", { locale: fr }) : <span>Choisissez une date</span>} */}
-                           <span>Choisissez une date</span> {/* Placeholder */}
+                          {date ? format(date, "PPP", { locale: fr }) : <span>Choisissez une date</span>}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
-                        {/* <Calendar mode="single" selected={date} onSelect={setDate} initialFocus locale={fr} /> */}
-                        <Calendar mode="single" initialFocus locale={fr} /> {/* Simplified */}
+                        <Calendar
+                         mode="single"
+                         selected={date}
+                         onSelect={setDate}
+                         initialFocus
+                         locale={fr}
+                        />
                       </PopoverContent>
                     </Popover>
                   </div>

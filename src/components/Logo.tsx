@@ -11,7 +11,7 @@ export function Logo({ width = 120, height = 40, className }: LogoProps) {
   return (
     <Link href="/" className={className}>
       <Image
-        src="/logo-entrelles.png" // Assumes logo-entrelles.png is in the /public folder
+        src="/logo-entrelles.png" // This component displays the Entrelles logo, expecting logo-entrelles.png in the /public folder
         alt="Entrelles Logo"
         width={width}
         height={height}

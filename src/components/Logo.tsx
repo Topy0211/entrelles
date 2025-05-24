@@ -2,8 +2,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 interface LogoProps {
-  width?: number; // Desired width for the clickable area
-  height?: number; // Desired height for the clickable area, also used as the dimension for the square image
+  width?: number; // Desired width for the clickable Link area
+  height?: number; // Desired height for the clickable Link area.
+                   // This will also be used as the dimension for the square Image component.
   className?: string; // Applied to the Link container
 }
 
@@ -23,16 +24,16 @@ export function Logo({ width: containerWidth = 120, height: containerHeight = 40
         width: containerWidth,
         height: containerHeight,
       }}
+      data-testid="app-logo-link"
     >
       <Image
-        src="/logo-entrelles.png" // This component displays the Entrelles logo, expecting logo-entrelles.png in the /public folder
-        alt="Entrelles Logo"
-        width={imageSquareSize}  // Use a square dimension for the Image component
-        height={imageSquareSize} // Use a square dimension for the Image component
-        priority
-        className="object-contain" // Ensures the square image fits and maintains aspect ratio within the Link area.
-                                   // It will be constrained by the smaller of its width/height (imageSquareSize)
-                                   // and the container's dimensions.
+        src="/logo-entrelles.png" // CRITICAL: This file MUST exist at 'public/logo-entrelles.png' (in the project root's public folder)
+        alt="Entrelles Application Logo" // Alt text for accessibility
+        width={imageSquareSize}  // Using containerHeight for a square aspect ratio matching the logo
+        height={imageSquareSize} // Using containerHeight for a square aspect ratio matching the logo
+        priority // The logo is likely an LCP element, so priority is good.
+        className="object-contain" // Ensures the square image fits and maintains aspect ratio.
+        data-testid="app-logo-image"
       />
     </Link>
   );

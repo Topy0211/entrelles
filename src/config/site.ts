@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { LayoutGrid, Car } from 'lucide-react'; // Simplified icons
+import { LayoutGrid, Car } from 'lucide-react'; // LayoutGrid might be unused after this change
 
 export type NavItem = {
   title: string;
@@ -20,7 +20,7 @@ export const siteConfig = {
   ] as NavItem[],
   mobileNav: [
     { title: "Accueil", href: "/home", icon: Car }, // Updated to /home
-    { title: "Fonctionnalités", href: "/features", icon: LayoutGrid },
+    // { title: "Fonctionnalités", href: "/features", icon: LayoutGrid }, // Removed as per request
     // Login/Register will still be shown via Header's direct button logic for mobile
   ] as NavItem[],
   footerNav: [

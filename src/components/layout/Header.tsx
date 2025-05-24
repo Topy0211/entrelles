@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { siteConfig, type NavItem } from '@/config/site';
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
-import { Menu } from 'lucide-react';
+import { Menu, Car, LayoutGrid, Search, PlusCircle, MessageSquare, Calculator, FileText, MapPin, Star } from 'lucide-react'; // Keep icons for mobile menu if needed
 import {
   Sheet,
   SheetContent,
@@ -17,6 +17,7 @@ export function Header() {
         <Logo width={100} height={35} /> {/* Logo now links to /home */}
         
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          {/* Removed NavLinks for: Fonctionnalités, Chercher un trajet, Proposer un trajet, Chatbot */}
           {siteConfig.mainNav.filter(item => !item.isButton).map((item) => {
             const IconComponent = item.icon;
             return (
@@ -28,10 +29,10 @@ export function Header() {
               />
             );
           })}
-           <NavLink href="/features" title="Fonctionnalités" />
-           <NavLink href="/chercher-trajet" title="Chercher un trajet" />
-           <NavLink href="/proposer-trajet" title="Proposer un trajet" />
-           <NavLink href="/chatbot" title="Chatbot" />
+          {/* <NavLink href="/features" title="Fonctionnalités" /> */}
+          {/* <NavLink href="/chercher-trajet" title="Chercher un trajet" /> */}
+          {/* <NavLink href="/proposer-trajet" title="Proposer un trajet" /> */}
+          {/* <NavLink href="/chatbot" title="Chatbot" /> */}
 
           {siteConfig.secondaryNav.map((item) => {
             const IconComponent = item.icon;
@@ -74,7 +75,7 @@ export function Header() {
                 <Logo width={120} height={40} /> {/* Logo now links to /home */}
               </div>
               <nav className="flex flex-col space-y-4">
-                {siteConfig.mobileNav.map((item) => { // mobileNav items link to /home and /features
+                {siteConfig.mobileNav.map((item) => { // mobileNav items link to /home (and "Fonctionnalités" removed from siteConfig)
                   const IconComponent = item.icon;
                   return (
                     <NavLink 
@@ -86,13 +87,16 @@ export function Header() {
                     />
                   );
                 })}
-                 <NavLink href="/chercher-trajet" title="Chercher un trajet" isMobile icon={<Menu className="h-5 w-5 text-primary" />} />
-                 <NavLink href="/proposer-trajet" title="Proposer un trajet" isMobile icon={<Menu className="h-5 w-5 text-primary" />} />
-                 <NavLink href="/chatbot" title="Chatbot" isMobile icon={<Menu className="h-5 w-5 text-primary" />} />
-                 <NavLink href="/estimation-tarifaire" title="Estimation Tarifaire" isMobile icon={<Menu className="h-5 w-5 text-primary" />} />
-                 <NavLink href="/mentions-legales" title="Mentions Légales" isMobile icon={<Menu className="h-5 w-5 text-primary" />} />
-                 <NavLink href="/geolocalisation" title="Géolocalisation" isMobile icon={<Menu className="h-5 w-5 text-primary" />} />
-                 <NavLink href="/noter-une-utilisatrice" title="Noter une Utilisatrice" isMobile icon={<Menu className="h-5 w-5 text-primary" />} />
+                 {/* Removed NavLinks for: Chercher un trajet, Proposer un trajet, Chatbot */}
+                 {/* <NavLink href="/chercher-trajet" title="Chercher un trajet" isMobile icon={<Search className="h-5 w-5 text-primary" />} /> */}
+                 {/* <NavLink href="/proposer-trajet" title="Proposer un trajet" isMobile icon={<PlusCircle className="h-5 w-5 text-primary" />} /> */}
+                 {/* <NavLink href="/chatbot" title="Chatbot" isMobile icon={<MessageSquare className="h-5 w-5 text-primary" />} /> */}
+                 
+                 {/* Kept other utility links for mobile for discoverability */}
+                 <NavLink href="/estimation-tarifaire" title="Estimation Tarifaire" isMobile icon={<Calculator className="h-5 w-5 text-primary" />} />
+                 <NavLink href="/mentions-legales" title="Mentions Légales" isMobile icon={<FileText className="h-5 w-5 text-primary" />} />
+                 <NavLink href="/geolocalisation" title="Géolocalisation" isMobile icon={<MapPin className="h-5 w-5 text-primary" />} />
+                 <NavLink href="/noter-une-utilisatrice" title="Noter une Utilisatrice" isMobile icon={<Star className="h-5 w-5 text-primary" />} />
               </nav>
               <div className="mt-8 flex flex-col space-y-3">
                 {siteConfig.mainNav.filter(item => item.isButton).map((item) => (

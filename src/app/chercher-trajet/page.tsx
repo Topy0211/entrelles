@@ -1,27 +1,30 @@
-import { Metadata } from 'next';
+
+'use client'; // Make this a Client Component
+
+import type { Metadata } from 'next';
+import React, { useState } from 'react'; // Import React and useState
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Calendar } from '@/components/ui/calendar'; // Assuming you might want a date picker
+import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, Search } from 'lucide-react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale'; // For French date formatting
+import { fr } from 'date-fns/locale';
 
+// Metadata can be exported from a Client Component, but it's often better in a layout or parent Server Component.
+// For simplicity here, we'll keep it, but Next.js might handle it differently for Client Components.
+// Consider moving to a layout.tsx if issues arise or for best practice.
 export const metadata: Metadata = {
   title: 'Chercher un trajet - Entrelles',
   description: 'Trouvez un covoiturage adapté à vos besoins sur Entrelles.',
 };
 
-// Client component for date picker state, if needed directly in this page
-// For complex forms, consider react-hook-form
-// For now, this is a simple illustrative structure
-
 export default function ChercherTrajetPage() {
-  // const [date, setDate] = React.useState<Date | undefined>(new Date()); // Example state for date picker
+  const [date, setDate] = useState<Date | undefined>(undefined); // Manage date state
 
   return (
     <>
@@ -52,13 +55,17 @@ export default function ChercherTrajetPage() {
                         className="w-full justify-start text-left font-normal h-12 text-base"
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {/* {date ? format(date, "PPP", { locale: fr }) : <span>Choisissez une date</span>} */}
-                        <span>Choisissez une date</span> {/* Placeholder, full date picker logic would be client-side */}
+                        {date ? format(date, "PPP", { locale: fr }) : <span>Choisissez une date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      {/* <Calendar mode="single" selected={date} onSelect={setDate} initialFocus locale={fr} /> */}
-                       <Calendar mode="single" initialFocus locale={fr} /> {/* Simplified for SSR */}
+                       <Calendar 
+                         mode="single" 
+                         selected={date}
+                         onSelect={setDate}
+                         initialFocus 
+                         locale={fr} 
+                        />
                     </PopoverContent>
                   </Popover>
                 </div>

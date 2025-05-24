@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Logo } from '@/components/Logo'; 
-import { CheckCircle, XCircle } from 'lucide-react'; // Removed Female, Male
+import { Logo } from '@/components/Logo';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 type Step = 'interest' | 'gender' | 'exitInterest' | 'exitGender';
 
@@ -67,11 +67,9 @@ export default function WelcomePage() {
             </CardHeader>
             <CardContent className="flex flex-col space-y-4">
               <Button onClick={() => handleGenderResponse('female')} size="lg" className="w-full">
-                {/* <Female className="mr-2 h-5 w-5" /> Removed icon */}
                 Femme
               </Button>
               <Button onClick={() => handleGenderResponse('male')} size="lg" variant="outline" className="w-full">
-                {/* <Male className="mr-2 h-5 w-5" /> Removed icon */}
                 Homme
               </Button>
             </CardContent>

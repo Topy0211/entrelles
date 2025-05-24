@@ -4,7 +4,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Search, PlusCircle, MessageSquare, Calculator, FileText } from 'lucide-react';
+import { ArrowRight, Search, PlusCircle, MessageSquare, Calculator, FileText, MapPin, Star } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Fonctionnalités - Entrelles',
@@ -32,9 +32,21 @@ const featuresList = [
   },
   {
     title: 'Estimation Tarifaire',
-    description: 'Calculez facilement une estimation du coût de votre trajet.',
+    description: 'Calculez facilement une estimation du coût de votre trajet et gérez la facturation.',
     href: '/estimation-tarifaire',
     icon: <Calculator className="h-10 w-10 text-primary" />,
+  },
+  {
+    title: 'Géolocalisation',
+    description: 'Visualisez les trajets et les utilisateurs sur une carte interactive.',
+    href: '/geolocalisation',
+    icon: <MapPin className="h-10 w-10 text-primary" />,
+  },
+  {
+    title: 'Noter une Utilisatrice',
+    description: 'Évaluez votre expérience avec d\'autres membres de la communauté.',
+    href: '/noter-une-utilisatrice',
+    icon: <Star className="h-10 w-10 text-primary" />,
   },
   {
     title: 'Mentions Légales',

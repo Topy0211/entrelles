@@ -1,21 +1,15 @@
 'use client'; // Needed for useState and form handling
 
 import { useState, type FormEvent } from 'react';
-import { Metadata } from 'next';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Calculator, Euro } from 'lucide-react';
-
-// export const metadata: Metadata = { // Metadata should be in server components or page.tsx files, not client ones directly
-//   title: 'Estimation Tarifaire - Entrelles',
-//   description: 'Estimez le coût de votre covoiturage sur Entrelles.',
-// };
-// For client components, manage title using useEffect if needed, or keep metadata in a parent server component.
-// Or, create a server component wrapper for this page if metadata is crucial.
+import { Calculator, CreditCard, ShieldCheck } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { STRIPE_PUBLIC_KEY } from '@/config/keys'; // Import the key
 
 const COMMISSION = 3; // 3€
 const PRICE_PER_KM = 0.20; // 0.20€/km
@@ -45,7 +39,7 @@ export default function EstimationTarifairePage() {
               <Calculator className="mx-auto h-12 w-12 text-primary mb-4" />
               <CardTitle className="text-3xl md:text-4xl font-semibold text-primary">Estimation Tarifaire</CardTitle>
               <CardDescription className="mt-2 text-lg text-foreground/80">
-                Calculez une estimation du coût de votre trajet.
+                Calculez une estimation du coût de votre trajet et procédez au paiement.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -84,15 +78,52 @@ export default function EstimationTarifairePage() {
                     {estimatedPrice.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Ceci est une estimation. Le prix final peut varier.
+                    Ceci est une estimation. Le prix final peut varier légèrement.
                   </p>
                 </div>
               )}
+
+              <Separator className="my-8" />
+
+              <section id="facturation" className="space-y-4">
+                <h2 className="text-2xl font-semibold text-primary text-center flex items-center justify-center">
+                  <CreditCard className="mr-3 h-7 w-7" /> Facturation Sécurisée
+                </h2>
+                <p className="text-muted-foreground text-center">
+                  Procédez au paiement de votre trajet en toute sécurité via Stripe.
+                </p>
+                
+                <div className="p-4 border border-border rounded-lg bg-background space-y-3">
+                  <div className="flex items-center">
+                    <ShieldCheck className="h-5 w-5 text-green-600 mr-2" />
+                    <p className="text-sm font-medium text-foreground">Paiement sécurisé par Stripe</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Nous utilisons Stripe pour garantir la sécurité de vos transactions. Entrelles ne stocke pas vos informations de carte bancaire.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Clé publique Stripe (test) : <code className="bg-muted px-1 py-0.5 rounded text-xs">{STRIPE_PUBLIC_KEY}</code>
+                  </p>
+                </div>
+
+                {/* Placeholder for Stripe Element - Actual integration is complex */}
+                <div className="p-6 bg-muted/50 rounded-lg text-center">
+                  <p className="text-sm text-muted-foreground mb-3">
+                    (Zone pour l'élément de paiement Stripe - Intégration complète requise)
+                  </p>
+                  <Button disabled={estimatedPrice === null} className="w-full text-lg py-3 h-auto bg-green-600 hover:bg-green-700 text-white">
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    Payer {estimatedPrice !== null ? estimatedPrice.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }) : ''} avec Stripe
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground text-center mt-2">
+                  En cliquant sur "Payer avec Stripe", vous serez redirigé vers l'interface de paiement sécurisée de Stripe.
+                </p>
+              </section>
             </CardContent>
              <CardFooter>
                 <p className="text-xs text-muted-foreground text-center w-full">
                     Les paiements sont gérés de manière sécurisée. La devise utilisée est l'Euro (EUR).
-                    Notre clé publique Stripe pour référence : {process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || "pk_live_0gpJqhiGj7kddNqIOvAvH0YE00mJRAYH0q"} (Note: ceci est une clé publique de test).
                 </p>
              </CardFooter>
           </Card>

@@ -16,7 +16,8 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-foreground">Navigation</h4>
             <ul className="mt-4 space-y-2 text-sm">
-              <li><Link href="/" className="text-muted-foreground hover:text-primary">Accueil</Link></li>
+              <li><Link href="/home" className="text-muted-foreground hover:text-primary">Accueil</Link></li> 
+              <li><Link href="/features" className="text-muted-foreground hover:text-primary">Fonctionnalités</Link></li>
               <li><Link href="/chercher-trajet" className="text-muted-foreground hover:text-primary">Chercher un trajet</Link></li>
               <li><Link href="/proposer-trajet" className="text-muted-foreground hover:text-primary">Proposer un trajet</Link></li>
               <li><Link href="/chatbot" className="text-muted-foreground hover:text-primary">Chatbot</Link></li>

@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Search, PlusCircle, MessageSquare, FileText, Calculator, Car, LayoutGrid } from 'lucide-react';
+import { LayoutGrid, Car } from 'lucide-react'; // Simplified icons
 
 export type NavItem = {
   title: string;
@@ -13,15 +13,13 @@ export const siteConfig = {
   name: "Entrelles",
   description: "Le covoiturage au féminin en toute confiance.",
   mainNav: [
-    // "Proposer un trajet" button is removed from here as it's part of the features page.
-    // Other global buttons like Login/Profile can be added here if needed,
-    // but for now, Login is handled directly in Header.tsx
+    // mainNav is kept minimal, primary actions are on the features page
   ] as NavItem[],
   secondaryNav: [
     // All items moved to the /features page
   ] as NavItem[],
   mobileNav: [
-    { title: "Accueil", href: "/", icon: Car },
+    { title: "Accueil", href: "/home", icon: Car }, // Updated to /home
     { title: "Fonctionnalités", href: "/features", icon: LayoutGrid },
     // Login/Register will still be shown via Header's direct button logic for mobile
   ] as NavItem[],

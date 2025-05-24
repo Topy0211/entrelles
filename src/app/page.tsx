@@ -1,130 +1,114 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShieldQuestion, Calculator, MessageSquare } from "lucide-react";
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import Image from 'next/image';
 
-export const metadata: Metadata = {
-  title: 'Accueil - Entrelles',
-  description: 'Bienvenue sur Entrelles. Trouvez ou proposez un trajet en toute confiance.',
-};
+'use client';
 
-export default function HomePage() {
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Logo } from '@/components/Logo'; 
+import { CheckCircle, XCircle } from 'lucide-react'; // Removed Female, Male
+
+type Step = 'interest' | 'gender' | 'exitInterest' | 'exitGender';
+
+export default function WelcomePage() {
+  const [step, setStep] = useState<Step>('interest');
+  const router = useRouter();
+
+  const handleInterestResponse = (response: boolean) => {
+    if (response) {
+      setStep('gender');
+    } else {
+      setStep('exitInterest');
+    }
+  };
+
+  const handleGenderResponse = (gender: 'male' | 'female') => {
+    if (gender === 'female') {
+      router.push('/home');
+    } else {
+      setStep('exitGender');
+    }
+  };
+
   return (
-    <>
-      <Header />
-      <main className="flex-grow">
-        {/* Hero Section */}
-        <section className="relative py-20 md:py-32">
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-25"
-            style={{backgroundImage: "url('https://placehold.co/1920x1080/F8E4E9/C73053.png?text=.')"}}
-            data-ai-hint="subtle background"
-          ></div>
-          <div className="container mx-auto px-6 text-center relative z-10">
-            <h1 className="text-4xl md:text-6xl font-bold text-primary mb-6">
-              Entrelles
-            </h1>
-            <p className="text-lg md:text-2xl text-foreground/80 mb-10 max-w-2xl mx-auto">
-              Le covoiturage au féminin en toute confiance. Voyagez sereinement entre femmes.
-            </p>
-            <div className="flex justify-center items-center">
-              <Button asChild size="lg" className="text-xl px-10 py-7 shadow-xl font-semibold bg-primary hover:bg-primary/90 text-primary-foreground">
-                <Link href="/features">
-                  COMMENCER
-                </Link>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+      <div className="absolute top-8">
+        <Logo width={150} height={50} />
+      </div>
+      <Card className="w-full max-w-md shadow-xl">
+        {step === 'interest' && (
+          <>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-semibold text-primary">Bienvenue sur Entrelles</CardTitle>
+              <CardDescription className="mt-2 text-md">
+                Voulez-vous trouver un covoiturage exclusivement féminin pour voyager en toute confiance ?
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col space-y-4">
+              <Button onClick={() => handleInterestResponse(true)} size="lg" className="w-full">
+                <CheckCircle className="mr-2 h-5 w-5" />
+                Oui, je suis intéressée
               </Button>
-            </div>
-          </div>
-        </section>
+              <Button onClick={() => handleInterestResponse(false)} variant="outline" size="lg" className="w-full">
+                <XCircle className="mr-2 h-5 w-5" />
+                Non, pas pour le moment
+              </Button>
+            </CardContent>
+          </>
+        )}
 
-        {/* Features Section */}
-        <section className="py-16 md:py-24 bg-background">
-          <div className="container mx-auto px-6">
-            <h2 className="text-3xl font-semibold text-center text-foreground mb-12">
-              Pourquoi choisir Entrelles ?
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardHeader>
-                  <div className="p-3 bg-primary/10 rounded-full w-fit mb-4">
-                    <ShieldQuestion className="h-8 w-8 text-primary" />
-                  </div>
-                  <CardTitle className="text-xl text-primary">Sécurité et Confiance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Une communauté de femmes pour des trajets en toute sérénité. Profils vérifiés pour plus de sécurité.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardHeader>
-                  <div className="p-3 bg-primary/10 rounded-full w-fit mb-4">
-                    <Calculator className="h-8 w-8 text-primary" />
-                  </div>
-                  <CardTitle className="text-xl text-primary">Tarifs Justes</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Des estimations claires et des prix équitables pour conductrices et passagères.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardHeader>
-                   <div className="p-3 bg-primary/10 rounded-full w-fit mb-4">
-                    <MessageSquare className="h-8 w-8 text-primary" />
-                  </div>
-                  <CardTitle className="text-xl text-primary">Support Dédié</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Notre chatbot et équipe support sont là pour répondre à toutes vos questions.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+        {step === 'gender' && (
+          <>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-semibold text-primary">Quel est votre genre ?</CardTitle>
+              <CardDescription className="mt-2 text-md">
+                Cette information nous aide à maintenir une communauté sécurisée pour les femmes.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col space-y-4">
+              <Button onClick={() => handleGenderResponse('female')} size="lg" className="w-full">
+                {/* <Female className="mr-2 h-5 w-5" /> Removed icon */}
+                Femme
+              </Button>
+              <Button onClick={() => handleGenderResponse('male')} size="lg" variant="outline" className="w-full">
+                {/* <Male className="mr-2 h-5 w-5" /> Removed icon */}
+                Homme
+              </Button>
+            </CardContent>
+          </>
+        )}
 
-        {/* How it works Section */}
-        <section className="py-16 md:py-24 bg-secondary/30">
-            <div className="container mx-auto px-6">
-                <h2 className="text-3xl font-semibold text-center text-foreground mb-12">Comment ça marche ?</h2>
-                <div className="max-w-2xl mx-auto">
-                    <div className="space-y-8">
-                        <div className="flex items-start">
-                            <div className="flex-shrink-0 h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xl shadow-md">1</div>
-                            <div className="ml-6">
-                                <h3 className="text-2xl font-semibold text-primary mb-1">Créez votre profil</h3>
-                                <p className="text-muted-foreground text-lg mt-1">Inscrivez-vous et complétez votre profil en quelques étapes simples.</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start">
-                            <div className="flex-shrink-0 h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xl shadow-md">2</div>
-                            <div className="ml-6">
-                                <h3 className="text-2xl font-semibold text-primary mb-1">Cherchez ou proposez</h3>
-                                <p className="text-muted-foreground text-lg mt-1">Trouvez un trajet qui vous convient ou proposez vos places disponibles.</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start">
-                            <div className="flex-shrink-0 h-12 w-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xl shadow-md">3</div>
-                            <div className="ml-6">
-                                <h3 className="text-2xl font-semibold text-primary mb-1">Voyagez ensemble</h3>
-                                <p className="text-muted-foreground text-lg mt-1">Mettez-vous d'accord sur les détails et profitez d'un trajet convivial et sécurisé.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        {step === 'exitInterest' && (
+          <>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-semibold text-primary">Merci de votre intérêt</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-center text-muted-foreground">
+                Entrelles est une application de covoiturage dédiée aux femmes pour assurer des trajets sécurisés et confortables.
+                N'hésitez pas à revenir si vos besoins changent.
+              </p>
+            </CardContent>
+          </>
+        )}
 
-      </main>
-      <Footer />
-    </>
+        {step === 'exitGender' && (
+          <>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-semibold text-primary">Application réservée</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-center text-muted-foreground">
+                Entrelles est une plateforme de covoiturage exclusivement féminine.
+                Merci de votre compréhension.
+              </p>
+            </CardContent>
+          </>
+        )}
+      </Card>
+      <p className="mt-8 text-xs text-muted-foreground text-center max-w-md">
+        Entrelles - Le covoiturage au féminin en toute confiance.
+      </p>
+    </div>
   );
 }

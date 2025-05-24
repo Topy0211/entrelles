@@ -9,30 +9,28 @@ interface LogoProps {
 }
 
 export function Logo({ width: containerWidth = 120, height: containerHeight = 40, className }: LogoProps) {
-  // The logo image (/logo-entrelles.png) is expected to be square.
-  // We use containerHeight as the dimension for the square Image component.
   const imageSquareSize = containerHeight;
 
   return (
     <Link
-      href="/"
+      href="/home" // Updated to link to /home, the main application page
       className={className}
       style={{
-        display: 'inline-flex', // Use flex to help center the image
+        display: 'inline-flex', 
         alignItems: 'center',
-        justifyContent: 'center', // Center the image horizontally if containerWidth is > imageSquareSize
+        justifyContent: 'center', 
         width: containerWidth,
         height: containerHeight,
       }}
       data-testid="app-logo-link"
     >
       <Image
-        src="/logo-entrelles.png" // CRITICAL: This file MUST exist at 'public/logo-entrelles.png' (in the project root's public folder)
-        alt="Entrelles Application Logo" // Alt text for accessibility
-        width={imageSquareSize}  // Using containerHeight for a square aspect ratio matching the logo
-        height={imageSquareSize} // Using containerHeight for a square aspect ratio matching the logo
-        priority // The logo is likely an LCP element, so priority is good.
-        className="object-contain" // Ensures the square image fits and maintains aspect ratio.
+        src="/logo-entrelles.png" // Ensure this file exists at 'public/logo-entrelles.png'
+        alt="Logo Entrelles" 
+        width={imageSquareSize}
+        height={imageSquareSize}
+        priority 
+        className="object-contain" 
         data-testid="app-logo-image"
       />
     </Link>

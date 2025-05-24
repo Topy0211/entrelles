@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { FcGoogle } from 'react-icons/fc'; // Using react-icons for Google icon
+import { FcGoogle } from 'react-icons/fc'; 
 
 export const metadata: Metadata = {
   title: 'Connexion - Entrelles',
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <main className="flex flex-grow items-center justify-center p-4 md:p-8">
+    <main className="flex flex-grow items-center justify-center p-4 md:p-8 bg-secondary/30">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <div className="mx-auto mb-6">
@@ -27,8 +27,9 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* This button now leads to the questionnaire at / */}
           <Button asChild className="w-full" size="lg">
-            <Link href="/">COMMENCER</Link>
+            <Link href="/">COMMENCER</Link> 
           </Button>
           
           <div className="relative">

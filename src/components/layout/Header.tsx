@@ -17,12 +17,28 @@ export function Header() {
         <Logo width={100} height={35} />
         
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          {siteConfig.mainNav.filter(item => !item.isButton).map((item) => (
-            <NavLink key={item.href} href={item.href} item={item} />
-          ))}
-          {siteConfig.secondaryNav.map((item) => (
-            <NavLink key={item.href} href={item.href} item={item} />
-          ))}
+          {siteConfig.mainNav.filter(item => !item.isButton).map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <NavLink 
+                key={item.href} 
+                href={item.href} 
+                title={item.title}
+                icon={IconComponent && <IconComponent className="mr-0 h-4 w-4" />} // Icon rendered here, mr-0 as gap is in NavLink
+              />
+            );
+          })}
+          {siteConfig.secondaryNav.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <NavLink 
+                key={item.href} 
+                href={item.href} 
+                title={item.title}
+                icon={IconComponent && <IconComponent className="mr-0 h-4 w-4" />} // Icon rendered here
+              />
+            );
+          })}
         </nav>
 
         <div className="hidden md:flex items-center space-x-3">
@@ -53,12 +69,18 @@ export function Header() {
                 <Logo width={120} height={40} />
               </div>
               <nav className="flex flex-col space-y-4">
-                {siteConfig.mobileNav.map((item) => (
-                  <NavLink key={item.href} href={item.href} item={item} isMobile>
-                    {item.icon && <item.icon className="mr-2 h-5 w-5 text-primary" />}
-                    {item.title}
-                  </NavLink>
-                ))}
+                {siteConfig.mobileNav.map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <NavLink 
+                      key={item.href} 
+                      href={item.href} 
+                      title={item.title} 
+                      isMobile
+                      icon={IconComponent && <IconComponent className="h-5 w-5 text-primary" />} // Icon rendered here
+                    />
+                  );
+                })}
               </nav>
               <div className="mt-8 flex flex-col space-y-3">
                 {siteConfig.mainNav.filter(item => item.isButton).map((item) => (

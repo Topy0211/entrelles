@@ -3,16 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import type { NavItem } from '@/config/site';
 
 interface NavLinkProps {
   href: string;
-  item: NavItem;
-  children?: React.ReactNode;
+  title: string; // Title is now a direct prop
+  icon?: React.ReactNode; // Rendered icon JSX, optional
   isMobile?: boolean;
+  className?: string; // Allow additional class names
 }
 
-export function NavLink({ href, item, children, isMobile = false }: NavLinkProps) {
+export function NavLink({ href, title, icon, isMobile = false, className }: NavLinkProps) {
   const pathname = usePathname();
   const isActive = pathname === href;
 
@@ -22,10 +22,13 @@ export function NavLink({ href, item, children, isMobile = false }: NavLinkProps
       className={cn(
         "transition-colors hover:text-primary",
         isActive ? "text-primary font-semibold" : "text-foreground/70",
-        isMobile && "flex items-center py-2 text-lg"
+        "flex items-center gap-2", // Add gap for spacing between icon and title
+        isMobile ? "py-2 text-lg" : "text-sm font-medium", // Apply specific styles for mobile/desktop
+        className
       )}
     >
-      {children || item.title}
+      {icon}
+      {title}
     </Link>
   );
 }

@@ -1,7 +1,7 @@
+'use client'; 
 
-'use client'; // Make this a Client Component
-
-import React, { useState } from 'react'; // Import React and useState
+import React, { useState, useEffect } from 'react';
+import type { Locale } from 'date-fns';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,12 +12,18 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, Search } from 'lucide-react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+// Removed direct import: import { fr } from 'date-fns/locale';
 
-// Metadata has been moved to layout.tsx
 
 export default function ChercherTrajetPage() {
-  const [date, setDate] = useState<Date | undefined>(undefined); // Manage date state
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [locale, setLocale] = useState<Locale | undefined>(undefined);
+
+  useEffect(() => {
+    import('date-fns/locale/fr').then(module => {
+      setLocale(module.fr);
+    });
+  }, []);
 
   return (
     <>
@@ -46,19 +52,24 @@ export default function ChercherTrajetPage() {
                       <Button
                         variant={"outline"}
                         className="w-full justify-start text-left font-normal h-12 text-base"
+                        disabled={!locale}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP", { locale: fr }) : <span>Choisissez une date</span>}
+                        {date && locale ? format(date, "PPP", { locale }) : <span>Choisissez une date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                       <Calendar 
-                         mode="single" 
-                         selected={date}
-                         onSelect={setDate}
-                         initialFocus 
-                         locale={fr} 
-                        />
+                       {locale ? (
+                          <Calendar 
+                           mode="single" 
+                           selected={date}
+                           onSelect={setDate}
+                           initialFocus 
+                           locale={locale} 
+                          />
+                        ) : (
+                           <div className="p-4 text-center text-muted-foreground">Chargement du calendrier...</div>
+                        )}
                     </PopoverContent>
                   </Popover>
                 </div>

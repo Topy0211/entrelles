@@ -1,8 +1,9 @@
+
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShieldQuestion, Calculator, MessageSquare, Search, PlusCircle } from "lucide-react"; // Added Search, PlusCircle
+import { ShieldQuestion, Calculator, MessageSquare } from "lucide-react";
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import Image from 'next/image';

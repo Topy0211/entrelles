@@ -1,4 +1,4 @@
-'use client'; 
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import type { Locale } from 'date-fns';
@@ -60,12 +60,12 @@ export default function ChercherTrajetPage() {
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
                        {locale ? (
-                          <Calendar 
-                           mode="single" 
+                          <Calendar
+                           mode="single"
                            selected={date}
                            onSelect={setDate}
-                           initialFocus 
-                           locale={locale} 
+                           initialFocus
+                           locale={locale}
                           />
                         ) : (
                            <div className="p-4 text-center text-muted-foreground">Chargement du calendrier...</div>

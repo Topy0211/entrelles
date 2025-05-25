@@ -1,46 +1,95 @@
 
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { BellRing, Car, MessageSquare } from 'lucide-react';
+import { BellRing, Car, MessageSquare, AlertCircle } from 'lucide-react';
 
-// Placeholder data for notifications
-const notifications = [
-  {
-    id: '1',
-    icon: <Car className="h-5 w-5 text-primary" />,
-    title: 'Nouveau trajet publié !',
-    description: 'Un trajet de Paris à Lyon (conductrice: Sophie L.) a été ajouté et correspond à vos alertes.',
-    time: 'il y a 5 minutes',
-    unread: true,
-  },
-  {
-    id: '2',
-    icon: <MessageSquare className="h-5 w-5 text-blue-500" />,
-    title: 'Message de Marie D.',
-    description: 'Concernant le trajet pour Bordeaux : "Je confirme ma place, merci !"',
-    time: 'il y a 1 heure',
-    unread: true,
-  },
-  {
-    id: '3',
-    icon: <Car className="h-5 w-5 text-primary" />,
-    title: 'Trajet Mis à Jour',
-    description: 'Le trajet Lille - Marseille a été modifié par la conductrice.',
-    time: 'il y a 3 heures',
-    unread: false,
-  },
-  {
-    id: '4',
-    icon: <BellRing className="h-5 w-5 text-green-500" />,
-    title: 'Bienvenue sur Entrelles !',
-    description: 'N\'oubliez pas de compléter votre profil pour une meilleure expérience.',
-    time: 'Hier',
-    unread: false,
-  },
-];
+// Define a type for our notifications
+interface AppNotification {
+  id: string;
+  iconName: 'Car' | 'MessageSquare' | 'BellRing' | 'AlertCircle'; // Added AlertCircle for generic fallback
+  title: string;
+  description: string;
+  time: string;
+  unread: boolean;
+  link?: string;
+}
+
+const iconComponents: Record<AppNotification['iconName'], React.ElementType> = {
+  Car: Car,
+  MessageSquare: MessageSquare,
+  BellRing: BellRing,
+  AlertCircle: AlertCircle, // Fallback icon
+};
+
+const getIcon = (iconName: AppNotification['iconName']) => {
+  const IconComponent = iconComponents[iconName] || AlertCircle;
+  const colorClass = iconName === 'Car' ? 'text-primary' : 
+                     iconName === 'MessageSquare' ? 'text-blue-500' :
+                     iconName === 'BellRing' ? 'text-green-500' :
+                     'text-muted-foreground';
+  return <IconComponent className={`h-5 w-5 ${colorClass}`} />;
+};
+
 
 export default function NotificationsPage() {
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+
+  useEffect(() => {
+    const loadNotifications = () => {
+      const storedNotificationsRaw = localStorage.getItem('entrelles-notifications');
+      if (storedNotificationsRaw) {
+        try {
+          const parsedNotifications: AppNotification[] = JSON.parse(storedNotificationsRaw);
+          setNotifications(parsedNotifications);
+        } catch (error) {
+          console.error("Error parsing notifications from localStorage", error);
+          // Initialize with default if parsing fails or empty
+          setNotifications([
+            {
+              id: 'default-welcome',
+              iconName: 'BellRing',
+              title: 'Bienvenue sur Entrelles !',
+              description: 'N\'oubliez pas de compléter votre profil pour une meilleure expérience.',
+              time: 'Maintenant',
+              unread: true,
+            },
+          ]);
+        }
+      } else {
+        // Initialize with default if no notifications are stored
+         setNotifications([
+            {
+              id: 'default-welcome-initial',
+              iconName: 'BellRing',
+              title: 'Bienvenue sur Entrelles !',
+              description: 'N\'oubliez pas de compléter votre profil pour une meilleure expérience.',
+              time: 'Maintenant',
+              unread: true,
+            },
+          ]);
+      }
+    };
+    loadNotifications();
+    // Optional: Listen for storage changes to update in real-time if other tabs modify it
+    // window.addEventListener('storage', loadNotifications);
+    // return () => window.removeEventListener('storage', loadNotifications);
+  }, []);
+
+  const markAllAsRead = () => {
+    // Option 1: Mark all as read visually
+    // setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
+    // localStorage.setItem('entrelles-notifications', JSON.stringify(notifications.map(n => ({ ...n, unread: false }))));
+    
+    // Option 2: Clear all notifications
+    setNotifications([]);
+    localStorage.removeItem('entrelles-notifications');
+  };
+
+
   return (
     <>
       <Header />
@@ -74,7 +123,7 @@ export default function NotificationsPage() {
                     >
                       <div className="flex items-start space-x-4">
                         <div className={`mt-1 p-2 rounded-full ${notification.unread ? 'bg-primary/20' : 'bg-muted'}`}>
-                          {notification.icon}
+                          {getIcon(notification.iconName)}
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between items-center">
@@ -102,8 +151,8 @@ export default function NotificationsPage() {
             </CardContent>
             {notifications.length > 0 && (
                 <CardFooter className="p-4 border-t justify-center">
-                    <button className="text-sm text-primary hover:underline">
-                        Marquer tout comme lu
+                    <button onClick={markAllAsRead} className="text-sm text-primary hover:underline">
+                        Effacer toutes les notifications
                     </button>
                 </CardFooter>
             )}

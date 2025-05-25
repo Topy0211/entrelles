@@ -1,5 +1,6 @@
+
 import type { LucideIcon } from 'lucide-react';
-import { LayoutGrid, Car } from 'lucide-react'; // LayoutGrid might be unused after this change
+import { Car, Star, MessageSquare, Bell } from 'lucide-react'; // Added MessageSquare and Bell for mobile nav
 
 export type NavItem = {
   title: string;
@@ -13,14 +14,15 @@ export const siteConfig = {
   name: "Entrelles",
   description: "Le covoiturage au féminin en toute confiance.",
   mainNav: [
-    // mainNav is kept minimal, primary actions are on the features page
+    // Desktop navigation is minimal as per previous requests
   ] as NavItem[],
   secondaryNav: [
-    // All items moved to the /features page
+    // All items moved to the /features page or accessed via icons
   ] as NavItem[],
   mobileNav: [
-    { title: "Accueil", href: "/home", icon: Car }, // Updated to /home
-    // { title: "Fonctionnalités", href: "/features", icon: LayoutGrid }, // Removed as per request
+    { title: "Accueil", href: "/home", icon: Car },
+    { title: "Fonctionnalités", href: "/features", icon: Star }, // Re-added for completeness in mobile
+    // Notifications and Chat are handled by NavLink directly in Header for mobile
     // Login/Register will still be shown via Header's direct button logic for mobile
   ] as NavItem[],
   footerNav: [

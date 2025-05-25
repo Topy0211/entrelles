@@ -2,35 +2,39 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { BellRing, Car, MessageSquare, AlertCircle } from 'lucide-react';
 
-// Define a type for our notifications
 interface AppNotification {
   id: string;
-  iconName: 'Car' | 'MessageSquare' | 'BellRing' | 'AlertCircle'; // Added AlertCircle for generic fallback
+  iconName: 'Car' | 'MessageSquare' | 'BellRing' | 'AlertCircle';
   title: string;
   description: string;
   time: string;
   unread: boolean;
   link?: string;
+  publisherName?: string; 
+  trajetDetails?: string; 
 }
 
 const iconComponents: Record<AppNotification['iconName'], React.ElementType> = {
   Car: Car,
   MessageSquare: MessageSquare,
   BellRing: BellRing,
-  AlertCircle: AlertCircle, // Fallback icon
+  AlertCircle: AlertCircle,
 };
 
 const getIcon = (iconName: AppNotification['iconName']) => {
   const IconComponent = iconComponents[iconName] || AlertCircle;
-  const colorClass = iconName === 'Car' ? 'text-primary' : 
-                     iconName === 'MessageSquare' ? 'text-blue-500' :
-                     iconName === 'BellRing' ? 'text-green-500' :
-                     'text-muted-foreground';
+  let colorClass = 'text-muted-foreground';
+  if (iconName === 'Car') colorClass = 'text-primary';
+  else if (iconName === 'MessageSquare') colorClass = 'text-blue-500';
+  else if (iconName === 'BellRing') colorClass = 'text-green-500';
+  
   return <IconComponent className={`h-5 w-5 ${colorClass}`} />;
 };
 
@@ -47,10 +51,9 @@ export default function NotificationsPage() {
           setNotifications(parsedNotifications);
         } catch (error) {
           console.error("Error parsing notifications from localStorage", error);
-          // Initialize with default if parsing fails or empty
           setNotifications([
             {
-              id: 'default-welcome',
+              id: 'default-welcome-error',
               iconName: 'BellRing',
               title: 'Bienvenue sur Entrelles !',
               description: 'N\'oubliez pas de compléter votre profil pour une meilleure expérience.',
@@ -60,10 +63,9 @@ export default function NotificationsPage() {
           ]);
         }
       } else {
-        // Initialize with default if no notifications are stored
          setNotifications([
             {
-              id: 'default-welcome-initial',
+              id: 'default-welcome-empty',
               iconName: 'BellRing',
               title: 'Bienvenue sur Entrelles !',
               description: 'N\'oubliez pas de compléter votre profil pour une meilleure expérience.',
@@ -74,19 +76,60 @@ export default function NotificationsPage() {
       }
     };
     loadNotifications();
-    // Optional: Listen for storage changes to update in real-time if other tabs modify it
-    // window.addEventListener('storage', loadNotifications);
-    // return () => window.removeEventListener('storage', loadNotifications);
   }, []);
 
-  const markAllAsRead = () => {
-    // Option 1: Mark all as read visually
-    // setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
-    // localStorage.setItem('entrelles-notifications', JSON.stringify(notifications.map(n => ({ ...n, unread: false }))));
-    
-    // Option 2: Clear all notifications
+  const markNotificationAsRead = (id: string) => {
+    setNotifications(prev =>
+      prev.map(n => (n.id === id ? { ...n, unread: false } : n))
+    );
+    // Update localStorage if needed for persistence (optional)
+    const updatedNotifications = notifications.map(n => (n.id === id ? { ...n, unread: false } : n));
+    localStorage.setItem('entrelles-notifications', JSON.stringify(updatedNotifications));
+  };
+  
+  const clearAllNotifications = () => {
     setNotifications([]);
     localStorage.removeItem('entrelles-notifications');
+  };
+
+  const NotificationItem = ({ notification }: { notification: AppNotification }) => {
+    const content = (
+        <div 
+            className={`flex items-start space-x-4 p-4 hover:bg-muted/50 transition-colors ${notification.unread ? 'bg-primary/5' : ''}`}
+            onClick={() => notification.link && markNotificationAsRead(notification.id)} // Mark as read on click if it's a link
+        >
+            <div className={`mt-1 p-2 rounded-full ${notification.unread ? 'bg-primary/20' : 'bg-muted'}`}>
+            {getIcon(notification.iconName)}
+            </div>
+            <div className="flex-1">
+            <div className="flex justify-between items-center">
+                <h3 className={`text-md font-semibold ${notification.unread ? 'text-primary' : 'text-foreground'}`}>
+                {notification.title}
+                </h3>
+                {notification.unread && (
+                <span className="text-xs bg-accent text-accent-foreground px-2 py-0.5 rounded-full">
+                    Nouveau
+                </span>
+                )}
+            </div>
+            <p className="text-sm text-muted-foreground mt-0.5">
+                {notification.description}
+            </p>
+            <p className="text-xs text-muted-foreground/80 mt-1.5">
+                {notification.time}
+            </p>
+            </div>
+        </div>
+    );
+
+    if (notification.link) {
+      return (
+        <Link href={notification.link} passHref legacyBehavior>
+          <a className="block cursor-pointer">{content}</a>
+        </Link>
+      );
+    }
+    return <div className="block">{content}</div>;
   };
 
 
@@ -115,35 +158,8 @@ export default function NotificationsPage() {
               ) : (
                 <ul className="divide-y divide-border">
                   {notifications.map((notification) => (
-                    <li
-                      key={notification.id}
-                      className={`p-4 hover:bg-muted/50 transition-colors ${
-                        notification.unread ? 'bg-primary/5' : ''
-                      }`}
-                    >
-                      <div className="flex items-start space-x-4">
-                        <div className={`mt-1 p-2 rounded-full ${notification.unread ? 'bg-primary/20' : 'bg-muted'}`}>
-                          {getIcon(notification.iconName)}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-center">
-                            <h3 className={`text-md font-semibold ${notification.unread ? 'text-primary' : 'text-foreground'}`}>
-                              {notification.title}
-                            </h3>
-                            {notification.unread && (
-                              <span className="text-xs bg-accent text-accent-foreground px-2 py-0.5 rounded-full">
-                                Nouveau
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-0.5">
-                            {notification.description}
-                          </p>
-                          <p className="text-xs text-muted-foreground/80 mt-1.5">
-                            {notification.time}
-                          </p>
-                        </div>
-                      </div>
+                    <li key={notification.id}>
+                      <NotificationItem notification={notification} />
                     </li>
                   ))}
                 </ul>
@@ -151,9 +167,9 @@ export default function NotificationsPage() {
             </CardContent>
             {notifications.length > 0 && (
                 <CardFooter className="p-4 border-t justify-center">
-                    <button onClick={markAllAsRead} className="text-sm text-primary hover:underline">
+                    <Button onClick={clearAllNotifications} variant="link" className="text-sm text-primary hover:underline">
                         Effacer toutes les notifications
-                    </button>
+                    </Button>
                 </CardFooter>
             )}
           </Card>

@@ -12,17 +12,19 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, PlusCircle, Car } from 'lucide-react';
 import { format } from 'date-fns';
-import { useToast } from "@/hooks/use-toast"; // Import useToast
+import { useToast } from "@/hooks/use-toast";
 
 // Define a type for our notifications
 interface AppNotification {
   id: string;
-  iconName: 'Car' | 'MessageSquare' | 'BellRing';
+  iconName: 'Car' | 'MessageSquare' | 'BellRing' | 'AlertCircle';
   title: string;
   description: string;
   time: string;
   unread: boolean;
   link?: string;
+  publisherName?: string; // For chat context
+  trajetDetails?: string; // For chat context
 }
 
 export function ProposerTrajetForm() {
@@ -34,7 +36,7 @@ export function ProposerTrajetForm() {
   const [places, setPlaces] = useState('');
   const [prix, setPrix] = useState('');
   const [details, setDetails] = useState('');
-  const { toast } = useToast(); // Initialize useToast
+  const { toast } = useToast();
 
   useEffect(() => {
     import('date-fns/locale/fr').then(module => {
@@ -44,7 +46,6 @@ export function ProposerTrajetForm() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // Basic validation
     if (!depart || !arrivee || !date || !heure || !places || !prix) {
       toast({
         title: "Erreur de formulaire",
@@ -54,13 +55,21 @@ export function ProposerTrajetForm() {
       return;
     }
 
+    const publisher = "une conductrice"; // Placeholder
+    const trajetInfo = `Trajet de ${depart} à ${arrivee}`;
+    const formattedDate = locale ? format(date, "PPP", { locale }) : format(date, "yyyy-MM-dd");
+
+
     const newTrajetNotification: AppNotification = {
       id: Date.now().toString(),
       iconName: 'Car',
       title: 'Nouveau trajet publié !',
-      description: `Départ: ${depart}, Arrivée: ${arrivee}, Date: ${format(date, "PPP", { locale })} à ${heure}. ${places} places à ${prix}€ chacune.`,
+      description: `${trajetInfo}, le ${formattedDate} à ${heure}. ${places} places à ${prix}€ chacune.`,
       time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
       unread: true,
+      publisherName: publisher,
+      trajetDetails: trajetInfo,
+      link: `/chat?publisherName=${encodeURIComponent(publisher)}&trajetDetails=${encodeURIComponent(trajetInfo)}`,
     };
 
     try {
@@ -71,10 +80,9 @@ export function ProposerTrajetForm() {
 
       toast({
         title: "Trajet Publié !",
-        description: "Votre trajet a été publié et une notification a été envoyée.",
+        description: "Votre trajet a été publié et une notification a été créée.",
       });
 
-      // Reset form fields
       setDepart('');
       setArrivee('');
       setDate(new Date());

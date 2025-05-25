@@ -1,6 +1,7 @@
+
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { BellRing, Car, MessageSquare } from 'lucide-react';
 
 // Placeholder data for notifications

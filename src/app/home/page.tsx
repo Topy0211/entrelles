@@ -1,16 +1,51 @@
 
+'use client';
+
+import { useState, useEffect } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShieldQuestion, Calculator, MessageSquare } from "lucide-react";
+import { ShieldQuestion, Calculator, MessageSquare, CheckCircle, Sparkles, Gift } from "lucide-react";
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import Image from 'next/image';
+import { useToast } from '@/hooks/use-toast';
 
 // Metadata will be handled by src/app/home/layout.tsx
 
 export default function HomePageContent() {
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState<boolean>(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const subscriptionStatus = localStorage.getItem('entrelles-subscription-status');
+    setIsSubscribed(subscriptionStatus === 'active');
+    setIsLoadingSubscription(false);
+  }, []);
+
+  const handleSubscribe = () => {
+    localStorage.setItem('entrelles-subscription-status', 'active');
+    setIsSubscribed(true);
+    toast({
+      title: "Abonnement activé !",
+      description: "Merci de soutenir Entrelles. Toutes les fonctionnalités sont maintenant débloquées.",
+    });
+    // En production, rediriger vers Stripe ici
+  };
+
+  const handleUnsubscribe = () => {
+    localStorage.removeItem('entrelles-subscription-status');
+    setIsSubscribed(false);
+    toast({
+      title: "Abonnement annulé",
+      description: "Votre abonnement a été annulé. Certaines fonctionnalités seront limitées.",
+      variant: "destructive"
+    });
+  };
+
+
   return (
     <>
       <Header />
@@ -36,6 +71,48 @@ export default function HomePageContent() {
                 </Link>
               </Button>
             </div>
+          </div>
+        </section>
+
+        {/* Subscription Section */}
+        <section id="abonnement" className="py-16 md:py-24 bg-primary/5">
+          <div className="container mx-auto px-6">
+            <h2 className="text-3xl font-semibold text-center text-primary mb-4">
+              Débloquez l'Expérience Complète Entrelles !
+            </h2>
+            <p className="text-lg text-center text-foreground/80 mb-10 max-w-2xl mx-auto">
+              Soutenez Entrelles et accédez à toutes nos fonctionnalités exclusives pour seulement <strong>3€/mois</strong>.
+            </p>
+            <Card className="max-w-lg mx-auto shadow-xl border-2 border-primary">
+              <CardHeader className="text-center">
+                <Gift className="h-16 w-16 text-primary mx-auto mb-4" />
+                <CardTitle className="text-2xl text-primary">Abonnement Mensuel Entrelles+</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center space-y-4">
+                <p className="text-4xl font-bold text-foreground">3€<span className="text-lg font-normal text-muted-foreground">/mois</span></p>
+                <ul className="space-y-2 text-left text-muted-foreground list-disc list-inside pl-4">
+                  <li><CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" /> Accès illimité à notre Chatbot IA</li>
+                  <li><CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" /> Fonctionnalité de Géolocalisation avancée</li>
+                  <li><CheckCircle className="inline-block h-5 w-5 text-green-500 mr-2" /> Toutes les fonctionnalités de base incluses</li>
+                  <li><Sparkles className="inline-block h-5 w-5 text-yellow-500 mr-2" /> Soutenez le développement d'Entrelles</li>
+                </ul>
+                {isLoadingSubscription ? (
+                   <Button size="lg" className="w-full mt-6 text-lg py-3 h-auto" disabled>Chargement...</Button>
+                ) : isSubscribed ? (
+                  <div className="mt-6 space-y-3">
+                    <p className="text-green-600 font-semibold text-lg"><CheckCircle className="inline-block h-6 w-6 mr-2" /> Vous êtes abonné(e) !</p>
+                    <Button onClick={handleUnsubscribe} variant="outline" size="lg" className="w-full text-lg py-3 h-auto">
+                      Se désabonner
+                    </Button>
+                  </div>
+                ) : (
+                  <Button onClick={handleSubscribe} size="lg" className="w-full mt-6 text-lg py-3 h-auto">
+                    S'abonner pour 3€/mois
+                  </Button>
+                )}
+                <p className="text-xs text-muted-foreground mt-4">Abonnement facultatif. Vous pouvez annuler à tout moment. Le paiement réel via Stripe sera intégré prochainement.</p>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
@@ -81,7 +158,7 @@ export default function HomePageContent() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Notre chatbot et équipe support sont là pour répondre à toutes vos questions.
+                    Notre chatbot et équipe support sont là pour répondre à toutes vos questions. <span className="text-xs italic">(Chatbot IA soumis à abonnement)</span>
                   </p>
                 </CardContent>
               </Card>

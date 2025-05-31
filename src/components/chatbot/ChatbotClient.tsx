@@ -1,13 +1,18 @@
+
 "use client";
 
 import { useState, useRef, useEffect, type FormEvent } from 'react';
+import Link from 'next/link';
 import { chatbot, type ChatbotInput, type ChatbotOutput } from '@/ai/flows/chatbot';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, MessageSquare, User } from 'lucide-react';
+import { Send, MessageSquare, User, AlertTriangle, Sparkles } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 interface Message {
   id: string;
@@ -20,10 +25,24 @@ export function ChatbotClient() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const subscriptionStatus = localStorage.getItem('entrelles-subscription-status');
+    setIsSubscribed(subscriptionStatus === 'active');
+  }, []);
+
+  useEffect(() => {
+    if (isSubscribed && messages.length === 0) {
+      setMessages([
+        { id: 'welcome', text: "Bonjour ! Comment puis-je vous aider aujourd'hui concernant Entrelles ?", sender: 'bot' }
+      ]);
+    }
+  }, [isSubscribed, messages.length]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || !isSubscribed) return;
 
     const userMessage: Message = { id: Date.now().toString(), text: input, sender: 'user' };
     setMessages(prev => [...prev, userMessage]);
@@ -32,7 +51,7 @@ export function ChatbotClient() {
 
     try {
       const chatbotInput: ChatbotInput = { question: input };
-      const response: ChatbotOutput = await chatbot(chatbotInput); // Call the server action
+      const response: ChatbotOutput = await chatbot(chatbotInput);
       const botMessage: Message = { id: (Date.now() + 1).toString(), text: response.answer, sender: 'bot' };
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
@@ -46,20 +65,45 @@ export function ChatbotClient() {
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-      const scrollElement = scrollAreaRef.current.querySelector('div > div'); // Adjust selector based on ScrollArea implementation
+      const scrollElement = scrollAreaRef.current.querySelector('div > div'); 
       if (scrollElement) {
         scrollElement.scrollTop = scrollElement.scrollHeight;
       }
     }
   }, [messages]);
-  
-  // Welcome message
-  useEffect(() => {
-    setMessages([
-      { id: 'welcome', text: "Bonjour ! Comment puis-je vous aider aujourd'hui concernant Entrelles ?", sender: 'bot' }
-    ]);
-  }, []);
 
+  if (isSubscribed === null) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-200px)] max-h-[700px] w-full max-w-2xl mx-auto bg-card shadow-xl rounded-lg border p-6 items-center justify-center">
+        <Skeleton className="h-8 w-3/4 mb-4" />
+        <Skeleton className="h-4 w-1/2 mb-6" />
+        <div className="space-y-4 w-full">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-12 w-1/3 ml-auto" />
+        </div>
+         <Skeleton className="h-12 w-full mt-auto" />
+      </div>
+    );
+  }
+
+  if (!isSubscribed) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] max-h-[700px] w-full max-w-2xl mx-auto bg-card shadow-xl rounded-lg border p-8 text-center">
+        <AlertTriangle className="h-16 w-16 text-primary mb-6" />
+        <AlertTitle className="text-2xl font-semibold text-primary mb-3">Fonctionnalité Premium</AlertTitle>
+        <AlertDescription className="text-lg text-foreground/80 mb-8">
+          L'assistant virtuel Entrelles est disponible pour nos abonnés.
+        </AlertDescription>
+        <Button asChild size="lg" className="text-lg py-3 h-auto">
+          <Link href="/home#abonnement">
+            <Sparkles className="mr-2 h-5 w-5" />
+            Découvrir l'abonnement
+          </Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-[calc(100vh-200px)] max-h-[700px] w-full max-w-2xl mx-auto bg-card shadow-xl rounded-lg border">

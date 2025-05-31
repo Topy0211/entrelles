@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,29 +19,41 @@ export default function HomePageContent() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const subscriptionStatus = localStorage.getItem('entrelles-subscription-status');
-    setIsSubscribed(subscriptionStatus === 'active');
-    setIsLoadingSubscription(false);
+    // Ensure localStorage is accessed only on the client
+    if (typeof window !== 'undefined') {
+      const subscriptionStatus = localStorage.getItem('entrelles-subscription-status');
+      setIsSubscribed(subscriptionStatus === 'active');
+      setIsLoadingSubscription(false);
+    }
   }, []);
 
   const handleSubscribe = () => {
-    localStorage.setItem('entrelles-subscription-status', 'active');
-    setIsSubscribed(true);
-    toast({
-      title: "Abonnement activé !",
-      description: "Merci de soutenir Entrelles. Toutes les fonctionnalités sont maintenant débloquées.",
-    });
-    // En production, rediriger vers Stripe ici
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('entrelles-subscription-status', 'active');
+      setIsSubscribed(true);
+      toast({
+        title: "Abonnement activé !",
+        description: "Merci de soutenir Entrelles. Vous allez être redirigé vers la page de paiement.",
+      });
+      // Redirect to a placeholder Stripe checkout URL.
+      // For a real application, you would generate a Stripe Checkout Session on your backend
+      // and redirect to session.url, or use a pre-configured Stripe Payment Link.
+      // Example: window.location.href = 'https://buy.stripe.com/your_payment_link_id';
+      // Using a generic Stripe domain as a placeholder:
+      window.location.href = 'https://checkout.stripe.com/pay/cs_test_a1placeholder12345'; // This is a non-functional placeholder
+    }
   };
 
   const handleUnsubscribe = () => {
-    localStorage.removeItem('entrelles-subscription-status');
-    setIsSubscribed(false);
-    toast({
-      title: "Abonnement annulé",
-      description: "Votre abonnement a été annulé. Certaines fonctionnalités seront limitées.",
-      variant: "destructive"
-    });
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('entrelles-subscription-status');
+      setIsSubscribed(false);
+      toast({
+        title: "Abonnement annulé",
+        description: "Votre abonnement a été annulé. Certaines fonctionnalités seront limitées.",
+        variant: "destructive"
+      });
+    }
   };
 
 
@@ -110,7 +121,9 @@ export default function HomePageContent() {
                     S'abonner pour 3€/mois
                   </Button>
                 )}
-                <p className="text-xs text-muted-foreground mt-4">Abonnement facultatif. Vous pouvez annuler à tout moment. Le paiement réel via Stripe sera intégré prochainement.</p>
+                <p className="text-xs text-muted-foreground mt-4">
+                  Redirection vers une page de paiement Stripe (simulation). Pour une intégration réelle, une configuration backend ou un Lien de Paiement Stripe est nécessaire.
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -202,3 +215,4 @@ export default function HomePageContent() {
     </>
   );
 }
+

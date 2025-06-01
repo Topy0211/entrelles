@@ -31,6 +31,7 @@ module.exports = {
     "import/no-unresolved": 0,
     "indent": ["error", 2],
     "object-curly-spacing": ["error", "never"],
-    "max-len": ["error", { "code": 80, "ignoreUrls": true, "ignoreStrings": true, "ignoreTemplateLiterals": true }]
+    "max-len": ["error", {code: 80, ignoreUrls: true, ignoreStrings: true, ignoreTemplateLiterals: true}],
+    "comma-dangle": ["error", "always-multiline"],
   },
 };

@@ -43,7 +43,7 @@ Provide your answer in the "answer" field.`,
         threshold: "BLOCK_MEDIUM_AND_ABOVE",
       },
     ],
-  }
+  },
 });
 
 // Define the Genkit flow
@@ -60,5 +60,5 @@ export const chatbotFlow = ai.defineFlow(
       return {answer: "Je suis désolée, je n'ai pas pu générer de réponse pour le moment. Veuillez réessayer."};
     }
     return output;
-  }
+  },
 );

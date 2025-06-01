@@ -1,17 +1,14 @@
 
 // src/app/api/genkit/[...flow]/route.ts
 import genkitNext from '@genkit-ai/next';
-// Import the actual chatbot flow function
-import { chatbot } from '@/ai/flows/chatbot'; 
-// We no longer need to import 'ai' from '@/ai/genkit' here if passing the flow directly.
-// We also don't need ChatbotInput/ChatbotOutput types here if genkitNext handles it.
-// NextResponse might still be needed for error handling if we customize, but let's see.
+// Import the actual chatbot flow action, not the wrapper function
+import { chatbotFlow } from '@/ai/flows/chatbot'; 
 
-// Pass the chatbot flow directly to genkitNext
-// This assumes genkitNext is designed to take a flow (Action) as its primary argument.
-export const POST = genkitNext(chatbot);
+// Pass the chatbot flow action directly to genkitNext
+export const POST = genkitNext(chatbotFlow);
 
-// Ensure other flows are registered with the main 'ai' instance if they exist,
-// though this file now only directly deals with the chatbot flow for this route.
+// This import ensures that flows defined in chatbot.ts (like chatbotFlow)
+// are registered with the global 'ai' instance. This can be important for
+// Genkit's internal mechanisms or dev tooling, even if chatbotFlow is passed directly above.
+// It also ensures that the 'ai' instance is initialized before 'chatbotFlow' is used by genkitNext.
 import '@/ai/flows/chatbot';
-

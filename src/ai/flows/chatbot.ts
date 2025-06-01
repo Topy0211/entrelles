@@ -3,7 +3,8 @@
 /**
  * @fileOverview A chatbot for answering frequently asked questions about the Entrelles service.
  *
- * - chatbot - A function that handles the chatbot interaction.
+ * - chatbot - An async wrapper function to call the chatbotFlow.
+ * - chatbotFlow - The Genkit flow action for the chatbot. This is the main export for API route.
  * - ChatbotInput - The input type for the chatbot function.
  * - ChatbotOutput - The return type for the chatbot function.
  */
@@ -21,6 +22,55 @@ const ChatbotOutputSchema = z.object({
 });
 export type ChatbotOutput = z.infer<typeof ChatbotOutputSchema>;
 
+// This is the Genkit Action (flow)
+export const chatbotFlow = ai.defineFlow(
+  {
+    name: 'chatbotFlow',
+    inputSchema: ChatbotInputSchema,
+    outputSchema: ChatbotOutputSchema,
+  },
+  async (input: ChatbotInput): Promise<ChatbotOutput> => {
+    try {
+      console.log(`[chatbotFlow] Received input: ${JSON.stringify(input)}`);
+      const result = await prompt(input); // 'prompt' is defined below
+      const output = result.output;
+
+      if (!output) {
+        console.error(
+          "[chatbotFlow] ERROR: Did not receive the expected output from the prompt. Full result:",
+          JSON.stringify(result, null, 2)
+        );
+        return { answer: "Désolé, je n'ai pas pu générer de réponse pour le moment. Veuillez réessayer (E1)." };
+      }
+      console.log(`[chatbotFlow] Successfully generated output: ${JSON.stringify(output)}`);
+      return output;
+    } catch (error: any) {
+      console.error("[chatbotFlow] CATCH BLOCK: An error occurred during prompt execution:", error);
+      // Log more details about the error
+      console.error("[chatbotFlow] CATCH BLOCK: Error message:", error.message);
+      console.error("[chatbotFlow] CATCH BLOCK: Error name:", error.name);
+      console.error("[chatbotFlow] CATCH BLOCK: Error stack:", error.stack);
+      
+      if (error.cause) {
+        console.error("[chatbotFlow] CATCH BLOCK: Error cause:", error.cause);
+      }
+
+      // Provide a more informative error message to the client
+      let clientErrorMessage = "Désolé, une erreur interne est survenue lors de la génération de la réponse. Veuillez réessayer.";
+      if (error.message) {
+        clientErrorMessage = `Désolé, une erreur interne est survenue: ${error.message}. Veuillez réessayer. (E2)`;
+      } else if (typeof error === 'string') {
+        clientErrorMessage = `Désolé, une erreur interne est survenue: ${error}. Veuillez réessayer. (E3)`;
+      }
+      
+      return { answer: clientErrorMessage };
+    }
+  }
+);
+
+// This is an async wrapper function that can be called from server components or other server-side code.
+// It's good practice to keep it if you need to call the flow from elsewhere in your server-side app,
+// but it's 'chatbotFlow' that should be passed to 'genkitNext'.
 export async function chatbot(input: ChatbotInput): Promise<ChatbotOutput> {
   return chatbotFlow(input);
 }
@@ -42,47 +92,3 @@ const prompt = ai.definePrompt({
   Now, answer the following question:
   Question: {{{question}}}`,
 });
-
-const chatbotFlow = ai.defineFlow(
-  {
-    name: 'chatbotFlow',
-    inputSchema: ChatbotInputSchema,
-    outputSchema: ChatbotOutputSchema,
-  },
-  async (input: ChatbotInput): Promise<ChatbotOutput> => {
-    try {
-      console.log(`[chatbotFlow] Received input: ${JSON.stringify(input)}`);
-      const result = await prompt(input);
-      const output = result.output;
-
-      if (!output) {
-        console.error(
-          "[chatbotFlow] ERROR: Did not receive the expected output from the prompt. Full result:",
-          JSON.stringify(result, null, 2)
-        );
-        return { answer: "Désolé, je n'ai pas pu générer de réponse pour le moment. Veuillez réessayer (E1)." };
-      }
-      console.log(`[chatbotFlow] Successfully generated output: ${JSON.stringify(output)}`);
-      return output;
-    } catch (error: any) {
-      console.error("[chatbotFlow] CATCH BLOCK: An error occurred during prompt execution:", error);
-      console.error("[chatbotFlow] CATCH BLOCK: Error message:", error.message);
-      console.error("[chatbotFlow] CATCH BLOCK: Error name:", error.name);
-      console.error("[chatbotFlow] CATCH BLOCK: Error stack:", error.stack);
-      // You can inspect other properties of 'error' if it's a custom error object from a library
-      if (error.cause) {
-        console.error("[chatbotFlow] CATCH BLOCK: Error cause:", error.cause);
-      }
-
-      let clientErrorMessage = "Désolé, une erreur interne est survenue lors de la génération de la réponse. Veuillez réessayer.";
-      if (error.message) {
-        clientErrorMessage = `Désolé, une erreur interne est survenue: ${error.message}. Veuillez réessayer. (E2)`;
-      } else if (typeof error === 'string') {
-        clientErrorMessage = `Désolé, une erreur interne est survenue: ${error}. Veuillez réessayer. (E3)`;
-      }
-      
-      return { answer: clientErrorMessage };
-    }
-  }
-);
-

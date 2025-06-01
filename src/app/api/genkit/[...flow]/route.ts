@@ -1,18 +1,10 @@
 
 // src/app/api/genkit/[...flow]/route.ts
-import genkitNextFunction from '@genkit-ai/next'; // Renamed for clarity
-import { ai as mainAiInstance } from '@/ai/genkit'; // Renamed for clarity
-import type { Genkit } from 'genkit'; // Explicitly import the Genkit type
+import genkitNext from '@genkit-ai/next'; // Use default import directly
+import { ai } from '@/ai/genkit'; // Use original name for the ai instance
 import '@/ai/flows/chatbot'; // Ensure chatbotFlow is registered with the ai instance
 
-// Define the expected shape of the options object for clarity
-interface ExpectedGenkitNextOptions {
-  ai: Genkit; // The Genkit instance
-}
-
-const optionsForGenkitNext: ExpectedGenkitNextOptions = {
-  ai: mainAiInstance,
-};
-
-// Call the function with the explicitly typed options
-export const POST = genkitNextFunction(optionsForGenkitNext);
+// Call the function directly with an inline object, passing the imported ai instance
+export const POST = genkitNext({
+  ai: ai,
+});

@@ -1,7 +1,7 @@
 
 import * as functions from 'firebase-functions';
-import * as express from 'express';
-import * as cors from 'cors';
+import express from 'express'; // Changed from 'import * as express'
+import cors from 'cors';       // Changed to default import for consistency
 import { chatbotFlow, type ChatbotInput, type ChatbotOutput } from './flows/chatbotFlow';
 // Logger can be useful for debugging in Cloud Functions
 import * as logger from "firebase-functions/logger";

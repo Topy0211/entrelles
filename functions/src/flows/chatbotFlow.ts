@@ -32,7 +32,7 @@ User's question: {{{question}}}
 
 Provide your answer in the "answer" field.`,
   config: {
-    model: "gemini-1.5-flash-latest", // Ensure model is specified
+    model: "gemini-pro", // Changed from gemini-1.5-flash-latest
     safetySettings: [
       {
         category: "HARM_CATEGORY_HARASSMENT",

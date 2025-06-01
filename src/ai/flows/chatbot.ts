@@ -1,3 +1,4 @@
+
 // chatbot.ts
 'use server';
 /**
@@ -50,7 +51,18 @@ const chatbotFlow = ai.defineFlow(
     outputSchema: ChatbotOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const result = await prompt(input);
+    const output = result.output;
+
+    if (!output) {
+      console.error(
+        "Chatbot flow did not receive the expected output from the prompt. Full result:",
+        JSON.stringify(result, null, 2)
+      );
+      // Return a default error message that fits the schema
+      return { answer: "Désolé, je n'ai pas pu générer de réponse pour le moment. Veuillez réessayer." };
+    }
+    return output;
   }
 );
+

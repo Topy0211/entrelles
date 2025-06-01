@@ -3,7 +3,8 @@
 
 import { useState, useRef, useEffect, type FormEvent } from 'react';
 import Link from 'next/link';
-import { chatbot, type ChatbotInput, type ChatbotOutput } from '@/ai/flows/chatbot';
+// Removed direct import of: import { chatbot, type ChatbotInput, type ChatbotOutput } from '@/ai/flows/chatbot';
+import type { ChatbotInput, ChatbotOutput } from '@/ai/flows/chatbot'; // Keep types for structure
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -46,17 +47,39 @@ export function ChatbotClient() {
 
     const userMessage: Message = { id: Date.now().toString(), text: input, sender: 'user' };
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input;
     setInput('');
     setIsLoading(true);
 
     try {
-      const chatbotInput: ChatbotInput = { question: input };
-      const response: ChatbotOutput = await chatbot(chatbotInput);
-      const botMessage: Message = { id: (Date.now() + 1).toString(), text: response.answer, sender: 'bot' };
+      const chatbotInput: ChatbotInput = { question: currentInput };
+      // Call the Genkit flow via the Next.js API route
+      const apiResponse = await fetch('/api/genkit/chatbotFlow', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(chatbotInput),
+      });
+
+      if (!apiResponse.ok) {
+        let errorText = `Erreur réseau: ${apiResponse.status}`;
+        try {
+            const errorData = await apiResponse.json();
+            errorText = errorData.message || errorData.error || errorText;
+        } catch (e) {
+            // Failed to parse error JSON
+        }
+        throw new Error(errorText);
+      }
+
+      const responseData: ChatbotOutput = await apiResponse.json();
+      const botMessage: Message = { id: (Date.now() + 1).toString(), text: responseData.answer, sender: 'bot' };
       setMessages(prev => [...prev, botMessage]);
-    } catch (error) {
-      console.error("Chatbot error:", error);
-      const errorMessage: Message = { id: (Date.now() + 1).toString(), text: "Désolée, je n'ai pas pu répondre. Veuillez réessayer.", sender: 'bot' };
+    } catch (error: any) {
+      console.error("Chatbot API error:", error);
+      const errorMessageText = error.message || "Désolée, une erreur est survenue. Veuillez réessayer.";
+      const errorMessage: Message = { id: (Date.now() + 1).toString(), text: errorMessageText, sender: 'bot' };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -125,7 +148,7 @@ export function ChatbotClient() {
           >
             {msg.sender === 'bot' && (
               <Avatar className="h-8 w-8">
-                <AvatarImage src="https://placehold.co/40x40/c73053/ffffff.png?text=E" alt="Bot" data-ai-hint="bot avatar" />
+                <AvatarImage src="https://placehold.co/40x40/c73053/ffffff.png?text=E" alt="Bot" data-ai-hint="bot avatar"/>
                 <AvatarFallback>E</AvatarFallback>
               </Avatar>
             )}
@@ -141,7 +164,7 @@ export function ChatbotClient() {
             </div>
              {msg.sender === 'user' && (
               <Avatar className="h-8 w-8">
-                 <AvatarImage src="https://placehold.co/40x40/F8E4E9/333333.png?text=U" alt="User" data-ai-hint="user avatar" />
+                 <AvatarImage src="https://placehold.co/40x40/F8E4E9/333333.png?text=U" alt="User" data-ai-hint="user avatar"/>
                 <AvatarFallback><User size={16}/></AvatarFallback>
               </Avatar>
             )}
@@ -150,7 +173,7 @@ export function ChatbotClient() {
         {isLoading && (
             <div className="flex items-end space-x-2 mr-auto justify-start">
                 <Avatar className="h-8 w-8">
-                    <AvatarImage src="https://placehold.co/40x40/c73053/ffffff.png?text=E" alt="Bot" data-ai-hint="bot avatar" />
+                    <AvatarImage src="https://placehold.co/40x40/c73053/ffffff.png?text=E" alt="Bot" data-ai-hint="bot avatar"/>
                     <AvatarFallback>E</AvatarFallback>
                 </Avatar>
                 <div className="p-3 rounded-lg shadow bg-secondary text-secondary-foreground rounded-bl-none">

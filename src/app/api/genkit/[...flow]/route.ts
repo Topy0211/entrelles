@@ -1,3 +1,4 @@
+
 // src/app/api/genkit/[...flow]/route.ts
 import genkitNext from '@genkit-ai/next';
 import { ai } from '@/ai/genkit'; // ai instance, may or may not be used by this handler pattern
@@ -16,7 +17,7 @@ export const POST = genkitNext({
       // It's unclear if genkitNext expects the raw result or a NextResponse here.
       // Returning the raw result first. If issues persist, this might need to be NextResponse.json(result).
       return result;
-    } catch (error: any)
+    } catch (error: any) { // Added missing '{' here
       console.error("Error in custom genkitNext handler:", error);
       // Ensure a response is always returned that matches one of the handler's expected return types
       if (error instanceof Error) {
@@ -36,3 +37,4 @@ export const POST = genkitNext({
 // This import ensures that flows defined in chatbot.ts are known to the main 'ai' instance,
 // which is generally good practice, though its direct effect with the custom handler pattern is less certain.
 import '@/ai/flows/chatbot';
+

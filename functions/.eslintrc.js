@@ -20,6 +20,7 @@ module.exports = {
   ignorePatterns: [
     "/lib/**/*", // Ignore built files.
     "/generated/**/*", // Ignore generated files.
+    "index.js", // Ignore the root index.js file from TypeScript specific linting
   ],
   plugins: [
     "@typescript-eslint",
@@ -29,5 +30,7 @@ module.exports = {
     "quotes": ["error", "double"],
     "import/no-unresolved": 0,
     "indent": ["error", 2],
+    "object-curly-spacing": ["error", "never"],
+    "max-len": ["error", { "code": 80, "ignoreUrls": true, "ignoreStrings": true, "ignoreTemplateLiterals": true }]
   },
 };

@@ -1,5 +1,5 @@
 
-import {genkit} from 'genkit';
+import {genkit, type Genkit as GenkitType} from 'genkit';
 import {googleAI} from '@genkit-ai/googleai';
 import { config } from 'dotenv';
 
@@ -20,7 +20,8 @@ if (process.env.GOOGLE_API_KEY) {
   );
 }
 
-export const ai = genkit({
+export const ai: GenkitType = genkit({
   plugins: [googleAI(googleAiPluginOptions)],
   model: 'gemini-1.5-flash-latest', 
-}); // Added missing closing brace and corrected typo
+});
+

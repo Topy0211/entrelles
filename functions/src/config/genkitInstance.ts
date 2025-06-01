@@ -18,5 +18,5 @@ if (process.env.GOOGLE_API_KEY) {
 
 export const ai: GenkitType = genkit({
   plugins: [googleAI(googleAiPluginOptions)],
-  model: "gemini-1.0-ultra", // Changed to gemini-1.0-ultra
+  model: "gemini-1.0-pro", // Changed to gemini-1.0-pro
 });

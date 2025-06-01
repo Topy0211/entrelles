@@ -1,12 +1,28 @@
-// This file is no longer needed as the Genkit backend has been moved to Firebase Cloud Functions
-// to support `output: 'export'` in Next.js.
-// It is kept to prevent build errors related to missing files if referenced elsewhere,
-// but it should not be actively used.
-// You can safely delete this file if no other part of the build process requires its presence.
 
-export const POST = () => {
-  return new Response('This API route is deprecated. Use the Firebase Cloud Function for chatbot.', { status: 410 });
-};
+// This file is effectively deprecated and its logic moved to Firebase Cloud Functions.
+// The following is added to satisfy Next.js `output: 'export'` requirements for dynamic routes.
 
-// To ensure it's treated as a module.
-export {};
+export async function generateStaticParams() {
+  // Return an empty array as there are no specific paths to pre-render for this deprecated route.
+  return [];
+}
+
+// Dummy GET handler
+export async function GET() {
+  return new Response('This API route has been moved to Firebase Cloud Functions and is deprecated.', {
+    status: 410, // HTTP 410 Gone
+    headers: {
+      'Content-Type': 'text/plain',
+    },
+  });
+}
+
+// Dummy POST handler
+export async function POST() {
+  return new Response('This API route has been moved to Firebase Cloud Functions and is deprecated.', {
+    status: 410, // HTTP 410 Gone
+    headers: {
+      'Content-Type': 'text/plain',
+    },
+  });
+}

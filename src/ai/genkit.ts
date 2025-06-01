@@ -23,3 +23,4 @@ if (process.env.GOOGLE_API_KEY) {
 export const ai = genkit({
   plugins: [googleAI(googleAiPluginOptions)],
   model: 'gemini-1.5-flash-latest', 
+}); // Added missing closing brace and corrected typo

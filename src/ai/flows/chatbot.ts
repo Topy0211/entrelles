@@ -1,5 +1,4 @@
 
-// chatbot.ts
 'use server';
 /**
  * @fileOverview A chatbot for answering frequently asked questions about the Entrelles service.
@@ -50,19 +49,40 @@ const chatbotFlow = ai.defineFlow(
     inputSchema: ChatbotInputSchema,
     outputSchema: ChatbotOutputSchema,
   },
-  async input => {
-    const result = await prompt(input);
-    const output = result.output;
+  async (input: ChatbotInput): Promise<ChatbotOutput> => {
+    try {
+      console.log(`[chatbotFlow] Received input: ${JSON.stringify(input)}`);
+      const result = await prompt(input);
+      const output = result.output;
 
-    if (!output) {
-      console.error(
-        "Chatbot flow did not receive the expected output from the prompt. Full result:",
-        JSON.stringify(result, null, 2)
-      );
-      // Return a default error message that fits the schema
-      return { answer: "Désolé, je n'ai pas pu générer de réponse pour le moment. Veuillez réessayer." };
+      if (!output) {
+        console.error(
+          "[chatbotFlow] ERROR: Did not receive the expected output from the prompt. Full result:",
+          JSON.stringify(result, null, 2)
+        );
+        return { answer: "Désolé, je n'ai pas pu générer de réponse pour le moment. Veuillez réessayer (E1)." };
+      }
+      console.log(`[chatbotFlow] Successfully generated output: ${JSON.stringify(output)}`);
+      return output;
+    } catch (error: any) {
+      console.error("[chatbotFlow] CATCH BLOCK: An error occurred during prompt execution:", error);
+      console.error("[chatbotFlow] CATCH BLOCK: Error message:", error.message);
+      console.error("[chatbotFlow] CATCH BLOCK: Error name:", error.name);
+      console.error("[chatbotFlow] CATCH BLOCK: Error stack:", error.stack);
+      // You can inspect other properties of 'error' if it's a custom error object from a library
+      if (error.cause) {
+        console.error("[chatbotFlow] CATCH BLOCK: Error cause:", error.cause);
+      }
+
+      let clientErrorMessage = "Désolé, une erreur interne est survenue lors de la génération de la réponse. Veuillez réessayer.";
+      if (error.message) {
+        clientErrorMessage = `Désolé, une erreur interne est survenue: ${error.message}. Veuillez réessayer. (E2)`;
+      } else if (typeof error === 'string') {
+        clientErrorMessage = `Désolé, une erreur interne est survenue: ${error}. Veuillez réessayer. (E3)`;
+      }
+      
+      return { answer: clientErrorMessage };
     }
-    return output;
   }
 );
 

@@ -23,7 +23,7 @@ interface Message {
 
 // IMPORTANT: User must replace <YOUR_PROJECT_ID> with their actual Firebase Project ID
 // and ensure the function is deployed to the 'us-central1' region or update the URL accordingly.
-const CLOUD_FUNCTION_URL = 'https://us-central1-<YOUR_PROJECT_ID>.cloudfunctions.net/chatbot';
+const CLOUD_FUNCTION_URL = 'https://us-central1-BDA63.cloudfunctions.net/chatbot';
 
 export function ChatbotClient() {
   const [messages, setMessages] = useState<Message[]>([]);

@@ -19,36 +19,31 @@ const nextConfig: NextConfig = {
     if (!isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,
-        '@opentelemetry/exporter-jaeger': false,
-        // If other opentelemetry or node-specific modules cause issues, they can be added here
+        '@opentelemetry/exporter-jaeger': false, // Alias Jaeger exporter to prevent client-side bundling
       };
+      
+      // Provide an empty mock for fs, net, tls for the client-side.
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        "fs": false,
+        "net": false,
+        "tls": false,
+      };
+
+      // If 'memfs' is intended for fs mocking (though 'fs: false' is often simpler for pure client)
+      // config.plugins.push(
+      //   new webpack.ProvidePlugin({
+      //     fs: require.resolve('memfs'), 
+      //   })
+      // );
     }
 
-    // To handle "require.extension is not supported by webpack" for certain .node files
-    // This is a common workaround but might need adjustment based on the exact problematic module
+    // To handle ".node" files if any dependency uses them (less common for these errors)
     config.module.rules.push({
       test: /\.node$/,
       use: 'node-loader',
     });
     
-    // Some libraries might use `fs` module which is not available in browser
-    // Provide an empty mock for it.
-    if (!isServer) {
-      config.plugins.push(
-        new webpack.ProvidePlugin({
-          fs: require.resolve('memfs'), // or use an empty module: `config.resolve.alias.fs = false;`
-        })
-      );
-       // Fallback for 'net' and 'tls' if they are still causing issues after aliasing jaeger
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        "net": false,
-        "tls": false,
-        "fs": false, // Explicitly ensure fs is ignored if ProvidePlugin isn't enough
-      };
-    }
-
-
     return config;
   },
 };

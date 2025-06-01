@@ -1,14 +1,7 @@
+// This file is no longer needed as the Genkit backend has been moved to Firebase Cloud Functions
+// to support `output: 'export'` in Next.js.
+// You can safely delete this file.
 
-// src/app/api/genkit/[...flow]/route.ts
-import genkitNext from '@genkit-ai/next';
-// Import the actual chatbot flow action, not the wrapper function
-import { chatbotFlow } from '@/ai/flows/chatbot'; 
-
-// Pass the chatbot flow action directly to genkitNext
-export const POST = genkitNext(chatbotFlow);
-
-// This import ensures that flows defined in chatbot.ts (like chatbotFlow)
-// are registered with the global 'ai' instance. This can be important for
-// Genkit's internal mechanisms or dev tooling, even if chatbotFlow is passed directly above.
-// It also ensures that the 'ai' instance is initialized before 'chatbotFlow' is used by genkitNext.
-import '@/ai/flows/chatbot';
+// export const POST = () => {
+//   return new Response('This API route is deprecated. Use the Firebase Cloud Function for chatbot.', { status: 410 });
+// };

@@ -3,8 +3,8 @@
 
 import { useState, useRef, useEffect, type FormEvent } from 'react';
 import Link from 'next/link';
-// Removed direct import of: import { chatbot, type ChatbotInput, type ChatbotOutput } from '@/ai/flows/chatbot';
-import type { ChatbotInput, ChatbotOutput } from '@/ai/flows/chatbot'; // Keep types for structure
+// Types are still useful for structuring messages
+import type { ChatbotInput, ChatbotOutput } from '@/ai/flows/chatbot'; // Path might be an issue if file is deleted
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -21,12 +21,17 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
+// IMPORTANT: User must replace <YOUR_PROJECT_ID> with their actual Firebase Project ID
+// and ensure the function is deployed to the 'us-central1' region or update the URL accordingly.
+const CLOUD_FUNCTION_URL = 'https://us-central1-<YOUR_PROJECT_ID>.cloudfunctions.net/chatbot';
+
 export function ChatbotClient() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null);
+  const [errorInfo, setErrorInfo] = useState<string | null>(null);
 
   useEffect(() => {
     const subscriptionStatus = localStorage.getItem('entrelles-subscription-status');
@@ -45,21 +50,30 @@ export function ChatbotClient() {
     e.preventDefault();
     if (!input.trim() || isLoading || !isSubscribed) return;
 
+    setErrorInfo(null);
     const userMessage: Message = { id: Date.now().toString(), text: input, sender: 'user' };
     setMessages(prev => [...prev, userMessage]);
     const currentInput = input;
     setInput('');
     setIsLoading(true);
 
+    if (CLOUD_FUNCTION_URL.includes('<YOUR_PROJECT_ID>')) {
+        const placeholderError = "L'URL de la fonction Cloud n'est pas configurée. Veuillez remplacer <YOUR_PROJECT_ID> dans le code.";
+        const errorMessage: Message = { id: (Date.now() + 1).toString(), text: placeholderError, sender: 'bot' };
+        setMessages(prev => [...prev, errorMessage]);
+        setIsLoading(false);
+        setErrorInfo(placeholderError);
+        return;
+    }
+    
     try {
-      const chatbotInput: ChatbotInput = { question: currentInput };
-      // Call the Genkit flow via the Next.js API route
-      const apiResponse = await fetch('/api/genkit/chatbotFlow', { 
+      const chatbotApiInput = { question: currentInput }; // Matches Cloud Function {question: ...}
+      const apiResponse = await fetch(CLOUD_FUNCTION_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(chatbotInput),
+        body: JSON.stringify(chatbotApiInput),
       });
 
       if (!apiResponse.ok) {
@@ -67,13 +81,15 @@ export function ChatbotClient() {
         try {
             const errorData = await apiResponse.json();
             errorText = errorData.message || errorData.error || errorText;
-        } catch (e) {
-            // Failed to parse error JSON
+        } catch (parseError) {
+            // Failed to parse error JSON, use status text
+            errorText = `Erreur: ${apiResponse.status} - ${apiResponse.statusText}`;
         }
         throw new Error(errorText);
       }
 
-      const responseData: ChatbotOutput = await apiResponse.json();
+      // Assuming ChatbotOutput structure { answer: string }
+      const responseData = await apiResponse.json();
       const botMessage: Message = { id: (Date.now() + 1).toString(), text: responseData.answer, sender: 'bot' };
       setMessages(prev => [...prev, botMessage]);
     } catch (error: any) {
@@ -81,6 +97,7 @@ export function ChatbotClient() {
       const errorMessageText = error.message || "Désolée, une erreur est survenue. Veuillez réessayer.";
       const errorMessage: Message = { id: (Date.now() + 1).toString(), text: errorMessageText, sender: 'bot' };
       setMessages(prev => [...prev, errorMessage]);
+      setErrorInfo(errorMessageText);
     } finally {
       setIsLoading(false);
     }
@@ -182,6 +199,15 @@ export function ChatbotClient() {
             </div>
         )}
       </ScrollArea>
+      {errorInfo && (
+          <div className="p-4 border-t">
+              <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Erreur de Configuration</AlertTitle>
+                  <AlertDescription>{errorInfo}</AlertDescription>
+              </Alert>
+          </div>
+      )}
       <form onSubmit={handleSubmit} className="p-4 border-t flex items-center space-x-2">
         <Input
           type="text"

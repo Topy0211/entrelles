@@ -19,7 +19,7 @@ const ChatbotOutputSchema = z.object({
 export type ChatbotOutput = z.infer<typeof ChatbotOutputSchema>;
 
 // The Genkit flow (chatbotFlow) and its prompt (chatbotPrompt) are now defined
-// and executed within the Firebase Cloud Function located at `functions/src/index.ts`.
+// and executed within the Firebase Cloud Function located at `functions/src/flows/chatbotFlow.ts`.
 // The Next.js client (`src/components/chatbot/ChatbotClient.tsx`) now makes a `fetch`
 // request to this Cloud Function.
 

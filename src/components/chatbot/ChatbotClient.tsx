@@ -4,7 +4,7 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react';
 import Link from 'next/link';
 // Types are still useful for structuring messages
-import type { ChatbotInput, ChatbotOutput } from '@/ai/flows/chatbot'; // Path might be an issue if file is deleted
+import type { ChatbotInput, ChatbotOutput } from '@/ai/flows/chatbot'; // Types now come from here
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -23,7 +23,7 @@ interface Message {
 
 // IMPORTANT: User must replace <YOUR_PROJECT_ID> with their actual Firebase Project ID
 // and ensure the function is deployed to the 'us-central1' region or update the URL accordingly.
-const CLOUD_FUNCTION_URL = 'https://us-central1-BDA63.cloudfunctions.net/chatbot';
+const CLOUD_FUNCTION_URL = 'https://us-central1-BDA63.cloudfunctions.net/api/chatbot';
 
 export function ChatbotClient() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -58,7 +58,7 @@ export function ChatbotClient() {
     setIsLoading(true);
 
     if (CLOUD_FUNCTION_URL.includes('<YOUR_PROJECT_ID>')) {
-        const placeholderError = "L'URL de la fonction Cloud n'est pas configurée. Veuillez remplacer <YOUR_PROJECT_ID> dans le code.";
+        const placeholderError = "L'URL de la fonction Cloud n'est pas configurée. Veuillez remplacer <YOUR_PROJECT_ID> dans src/components/chatbot/ChatbotClient.tsx.";
         const errorMessage: Message = { id: (Date.now() + 1).toString(), text: placeholderError, sender: 'bot' };
         setMessages(prev => [...prev, errorMessage]);
         setIsLoading(false);
@@ -67,7 +67,7 @@ export function ChatbotClient() {
     }
     
     try {
-      const chatbotApiInput = { question: currentInput }; // Matches Cloud Function {question: ...}
+      const chatbotApiInput: ChatbotInput = { question: currentInput }; // Matches ChatbotInput schema
       const apiResponse = await fetch(CLOUD_FUNCTION_URL, {
         method: 'POST',
         headers: {
@@ -79,17 +79,17 @@ export function ChatbotClient() {
       if (!apiResponse.ok) {
         let errorText = `Erreur réseau: ${apiResponse.status}`;
         try {
-            const errorData = await apiResponse.json();
-            errorText = errorData.message || errorData.error || errorText;
+            const errorData = await apiResponse.json(); // Try to parse error response
+            errorText = errorData.message || errorData.error || errorData.details || errorText;
         } catch (parseError) {
-            // Failed to parse error JSON, use status text
-            errorText = `Erreur: ${apiResponse.status} - ${apiResponse.statusText}`;
+            // Failed to parse error JSON, use status text or generic message
+            errorText = `Erreur ${apiResponse.status}: ${apiResponse.statusText || 'Impossible de contacter le serveur du chatbot.'}`;
         }
         throw new Error(errorText);
       }
 
       // Assuming ChatbotOutput structure { answer: string }
-      const responseData = await apiResponse.json();
+      const responseData: ChatbotOutput = await apiResponse.json();
       const botMessage: Message = { id: (Date.now() + 1).toString(), text: responseData.answer, sender: 'bot' };
       setMessages(prev => [...prev, botMessage]);
     } catch (error: any) {
@@ -105,9 +105,16 @@ export function ChatbotClient() {
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-      const scrollElement = scrollAreaRef.current.querySelector('div > div'); 
+      // Attempt to find the direct child that is the scrollable viewport
+      const scrollElement = scrollAreaRef.current.querySelector('div[data-radix-scroll-area-viewport]');
       if (scrollElement) {
         scrollElement.scrollTop = scrollElement.scrollHeight;
+      } else {
+        // Fallback if the specific selector isn't found (e.g. simple div wrapper)
+         const genericScrollElement = scrollAreaRef.current.firstElementChild;
+         if(genericScrollElement) {
+            genericScrollElement.scrollTop = genericScrollElement.scrollHeight;
+         }
       }
     }
   }, [messages]);
@@ -171,7 +178,7 @@ export function ChatbotClient() {
             )}
             <div
               className={cn(
-                "p-3 rounded-lg shadow",
+                "p-3 rounded-lg shadow min-w-[80px]",
                 msg.sender === 'user'
                   ? "bg-primary text-primary-foreground rounded-br-none"
                   : "bg-secondary text-secondary-foreground rounded-bl-none"
@@ -203,7 +210,7 @@ export function ChatbotClient() {
           <div className="p-4 border-t">
               <Alert variant="destructive">
                   <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>Erreur de Configuration</AlertTitle>
+                  <AlertTitle>Erreur de Communication</AlertTitle>
                   <AlertDescription>{errorInfo}</AlertDescription>
               </Alert>
           </div>
